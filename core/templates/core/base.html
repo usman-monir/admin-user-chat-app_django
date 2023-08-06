@@ -1,7 +1,4 @@
 {% load static %}
-
-<!doctype html>
-
 <html>
     <head>
         <meta charset="UTF-8">
@@ -10,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="{% static 'css/main.min.css' %}">
     </head>
 
-    <body>
+    <body style='background: black; color: grey;'>
         <div class="p-2">
             <nav class="p-6 bg-rose-600 text-white flex justify-between items-center rounded-xl">
                 <a href="{% url 'core:index' %}" class="text-xl">app</a>
