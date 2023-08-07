@@ -19,12 +19,17 @@ const chatIconElement = document.querySelector('#chat_icon')
 const chatWelcomeElement = document.querySelector('#chat_welcome')
 const chatRoomElement = document.querySelector('#chat_room')
 const chatNameElement = document.querySelector('#chat_name')
+const chatLogElement = document.querySelector('#chat_log')
 const chatMessageInputElement = document.querySelector('#chat_message_input')
 const chatMessageSubmitElement = document.querySelector('#chat_message_submit')
 
 /**
  * Functions
  */
+
+const scrollToBotttom = () =>{
+    chatLogElement.scrollTop = chatLogElement.scrollHeight
+}
 
 const getCookie = (name) => {
     let cookieVal = null
@@ -43,15 +48,58 @@ const getCookie = (name) => {
     return cookieVal
 }
 
-const JoinChatRoom = () =>{
+const sendMessage =() =>{
+    chatSocket.send(JSON.stringify({
+        'type': 'message',
+        'message': chatMessageInputElement.value,
+        'name': chatNameElement.value,
+    }))
+    chatMessageInputElement.value = ''
+    console.log('sendMessage')
+}
+
+const insertMessageToChatLog = (data) =>{
+    if (data.type == 'chat_message') {
+        if (data.agent) {
+            chatLogElement.innerHTML += `
+                <div class="flex w-full mt-2 space-x-3 max-w-md">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 text-center pt-2">${data.initials}</div>
+
+                    <div>
+                        <div class="bg-gray-300 p-3 rounded-l-lg rounded-br-lg">
+                            <p class="text-sm">${data.message}</p>
+                        </div>
+
+                        <span class="text-xs text-gray-500 leading-none">${data.created_at} ago</span>
+                    </div>
+                </div>
+            `
+        } else {
+            chatLogElement.innerHTML += `
+                <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
+                    <div>
+                        <div class="bg-blue-300 p-3 rounded-l-lg rounded-br-lg">
+                            <p class="text-sm">${data.message}</p>
+                        </div>
+
+                        <span class="text-xs text-gray-500 leading-none">${data.created_at} ago</span>
+                    </div>
+
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 text-center pt-2">${data.initials}</div>
+                </div>
+            `
+        }
+    }
+    scrollToBotttom()
+    console.log('insertMessageToChatLog')
+}
+
+const JoinChatRoom = async () =>{
     const data = new FormData();
     data.append('name', chatNameElement.value)
     data.append('url', chatWindowUrl)
-    console.log(data);
-    console.log(chatNameElement.value);
-    console.log(chatWindowUrl);
 
-    fetch(`/api/create-room/${chatRoomUuid}/`, {
+    await fetch(`/api/create-room/${chatRoomUuid}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken')
@@ -62,6 +110,14 @@ const JoinChatRoom = () =>{
     }).then((data)=>{
         console.log(data)
     })
+
+    chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/${chatRoomUuid}/`)
+    chatSocket.onopen = (e) =>  console.log('onopen');
+    chatSocket.onclose = (e) => console.log('onclose');
+    chatSocket.onmessage = (e) => {
+        console.log('onmessage', e);
+        insertMessageToChatLog(JSON.parse(e.data))
+    }
 }
 
 /**
@@ -69,7 +125,7 @@ const JoinChatRoom = () =>{
  */
 
 
-chatOpenElement.onclick = function(e) {
+chatOpenElement.onclick = (e) => {
     e.preventDefault()
 
     chatIconElement.classList.add('hidden')
@@ -77,7 +133,7 @@ chatOpenElement.onclick = function(e) {
     return false
 }
 
-chatJoinElement.onclick = function(e) {
+chatJoinElement.onclick = (e) => {
     e.preventDefault()
 
     chatWelcomeElement.classList.add('hidden')
@@ -85,4 +141,18 @@ chatJoinElement.onclick = function(e) {
 
     JoinChatRoom()
     return false
+}
+
+chatMessageSubmitElement.onclick = (e) => {
+    e.preventDefault()
+
+    sendMessage()
+
+    return false
+}
+
+chatMessageInputElement.onkeyup = (e) => {
+    if (e.keyCode == 13) {
+        sendMessage()
+    }
 }

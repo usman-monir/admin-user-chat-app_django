@@ -12,7 +12,8 @@ class Message(models.Model):
         ordering = ('created_at',)
 
     def __str__(self) -> str:
-        return f'message: {self.content} - {self.sent_by} - {self.created_at}'
+        return self.content
+
 
 class Room(models.Model):
     CHOICES = (('waiting','waiting'), ('active','active'), ('closed','closed'))
@@ -29,4 +30,4 @@ class Room(models.Model):
         ordering = ('created_at',)
 
     def __str__(self) -> str:
-        return f'room :{self.client} - {self.uuid}'
+        return f'room :{self.client} - {self.agent} - {self.status}'
