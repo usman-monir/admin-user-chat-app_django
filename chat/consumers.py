@@ -12,16 +12,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_name = self.scope['url_route']['kwargs'].get('room_name')
         self.room_group_name = f'chat_{self.room_name}'
         self.room = await self.get_room()
+        self.user = self.scope['user']
+
         # join the room
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         # waits for the incoming request
         await self.accept()
+        # Inform user
+        if self.user.is_staff:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'agent_joined'
+                }
+            )
+
 
     async def disconnect(self, code):
         print('disconnect')
         # leave the room
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        await self.close_room()
+        if not self.user.is_staff:
+            await self.close_room()
 
     async def receive(self, text_data):
         print('receive')
@@ -58,6 +70,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'created_at': event['created_at'],
         }))
 
+    async def agent_joined(self, event):
+        await self.send(text_data=json.dumps(
+            {
+                'type': event['type'],
+            }
+        ))
 
     @sync_to_async
     def close_room(self):

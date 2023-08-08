@@ -91,6 +91,11 @@ const insertMessageToChatLog = (data) =>{
             `
         }
     }
+    else if (data.type === 'agent_joined')
+    {
+        console.log('agent joined - main.js');
+        chatLogElement.innerHTML += ` <p class="p-3 text-center text-sm text-gray-500">Agent Joined!!</p>`
+    }
     scrollToBotttom()
     console.log('insertMessageToChatLog')
 }

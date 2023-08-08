@@ -43,17 +43,13 @@
         {% endfor %}
     </div>
 
-    {% if room.status == 'active' %}
-        <input type="text" name="body" id="chat_message_input" class="w-full mb-4 p-4 bg-gray-100 rounded-xl" placeholder="Type your message...">
-        <button id="chat_message_submit" class="py-2 px-6 bg-rose-600 text-white rounded-xl">Send</button>
-    {% endif %}
+    <input type="text" name="body" id="chat_message_input" class="w-full mb-4 p-4 bg-gray-100 rounded-xl" placeholder="Type your message...">
+    <button id="chat_message_submit" class="py-2 px-6 bg-rose-600 text-white rounded-xl">Send</button>
+
     <input type="text" hidden id='uuid' value='{{room.uuid }}'>
     <input type="text" hidden id='client' value='{{request.user.name}}'>
     <input type="text" hidden id='agent' value='{{request.user.id }}'>
 {% endblock %}
-
 {% block scripts %}
-{% if room.status == 'active' %}
 <script src='{% static "js/main_admin.js" %}'></script>
-{% endif %}
 {% endblock %}
