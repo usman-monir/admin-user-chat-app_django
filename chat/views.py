@@ -25,13 +25,18 @@ def create_room(request, uuid):
 
 @login_required
 def admin(request):
-    rooms = Room.objects.all()
-    users = User.objects.filter(is_staff=True)
+    if request.user.role == 'customer':
+        return redirect('/')
+    else:
+        rooms = Room.objects.all()
+        users = User.objects.filter(is_staff=True)
+        customers = User.objects.filter(is_staff=False , role='customer')
 
-    return render(request, 'chat/admin.html', {
-        'rooms': rooms,
-        'users': users
-    })
+        return render(request, 'chat/admin.html', {
+            'rooms': rooms,
+            'users': users,
+            'customers': customers,
+        })
 
 
 @login_required
