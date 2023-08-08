@@ -49,10 +49,11 @@ const getCookie = (name) => {
 }
 
 const sendMessage =() =>{
+    console.log(chatMessageInputElement.value);
     chatSocket.send(JSON.stringify({
         'type': 'message',
-        'message': chatMessageInputElement.value,
-        'name': chatNameElement.value,
+        'message': chatMessageInputElement.value || '𝘦𝘮𝘱𝘵𝘺 𝘮𝘦𝘴𝘴𝘢𝘨𝘦!',
+        'name': chatNameElement.value || ': (',
     }))
     chatMessageInputElement.value = ''
     console.log('sendMessage')
@@ -78,7 +79,7 @@ const insertMessageToChatLog = (data) =>{
             chatLogElement.innerHTML += `
                 <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
                     <div>
-                        <div class="bg-blue-300 p-3 rounded-l-lg rounded-br-lg">
+                        <div class="bg-blue-300 text-white p-3 rounded-l-lg rounded-br-lg">
                             <p class="text-sm">${data.message}</p>
                         </div>
 
@@ -96,7 +97,7 @@ const insertMessageToChatLog = (data) =>{
 
 const JoinChatRoom = async () =>{
     const data = new FormData();
-    data.append('name', chatNameElement.value)
+    data.append('name', chatNameElement.value || ':(')
     data.append('url', chatWindowUrl)
 
     await fetch(`/api/create-room/${chatRoomUuid}/`, {
@@ -141,6 +142,18 @@ chatJoinElement.onclick = (e) => {
 
     JoinChatRoom()
     return false
+}
+chatNameElement.onkeyup = (e) => {
+    if(e.keyCode == 13)
+    {
+        e.preventDefault()
+
+        chatWelcomeElement.classList.add('hidden')
+        chatRoomElement.classList.remove('hidden')
+
+        JoinChatRoom()
+        return false
+    }
 }
 
 chatMessageSubmitElement.onclick = (e) => {

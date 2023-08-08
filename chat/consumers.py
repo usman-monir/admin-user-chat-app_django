@@ -21,6 +21,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('disconnect')
         # leave the room
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        await self.close_room()
 
     async def receive(self, text_data):
         print('receive')
@@ -56,6 +57,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'initials': event['initials'],
             'created_at': event['created_at'],
         }))
+
+
+    @sync_to_async
+    def close_room(self):
+        self.room = Room.objects.get(uuid=self.room_name)
+        self.room.status = 'closed'
+        self.room.save()
 
     @sync_to_async
     def get_room(self):

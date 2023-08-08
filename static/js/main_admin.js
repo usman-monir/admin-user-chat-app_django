@@ -26,7 +26,7 @@ const scrollToBotttom = () =>{
 const sendMessage =() =>{
     chatSocket.send(JSON.stringify({
         'type': 'message',
-        'message': chatMessageInputElement.value,
+        'message': chatMessageInputElement.value || '𝘦𝘮𝘱𝘵𝘺 𝘮𝘦𝘴𝘴𝘢𝘨𝘦!',
         'agent': agent,
         'name': client,
 
@@ -55,7 +55,7 @@ const insertMessageToChatLog = (data) =>{
             chatLogElement.innerHTML += `
                 <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
                     <div>
-                        <div class="bg-blue-300 p-3 rounded-l-lg rounded-br-lg">
+                        <div class="bg-blue-300 text-white p-3 rounded-l-lg rounded-br-lg">
                             <p class="text-sm">${data.message}</p>
                         </div>
 
