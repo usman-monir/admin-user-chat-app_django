@@ -31,6 +31,13 @@ const scrollToBotttom = () =>{
     chatLogElement.scrollTop = chatLogElement.scrollHeight
 }
 
+const remove_typing_element = () => {
+    const agent_typing = document.querySelector('#agent-typing')
+    if(agent_typing) {
+        agent_typing.remove()
+    }
+}
+
 const getCookie = (name) => {
     let cookieVal = null
     if ( document.cookie && document.cookie != '' ) {
@@ -62,6 +69,7 @@ const sendMessage =() =>{
 const insertMessageToChatLog = (data) =>{
     if (data.type == 'chat_message') {
         if (data.agent) {
+            remove_typing_element()
             chatLogElement.innerHTML += `
                 <div class="flex w-full mt-2 space-x-3 max-w-md">
                     <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 text-center pt-2">${data.initials}</div>
@@ -91,10 +99,21 @@ const insertMessageToChatLog = (data) =>{
             `
         }
     }
-    else if (data.type === 'agent_joined')
+    else if (data.type == 'agent_joined')
     {
         console.log('agent joined - main.js');
-        chatLogElement.innerHTML += ` <p class="p-3 text-center text-sm text-gray-500">Agent Joined!!</p>`
+        chatLogElement.innerHTML += ` <p class="p-3 text-center text-sm text-gray-500">Agent has Joined</p>`
+    }
+    else if (data.type == 'agent_typing')
+    {
+        console.log('agent typing - main.js');
+        remove_typing_element()
+        chatLogElement.innerHTML += ` <p id='agent-typing' class="p-3 text-center text-sm text-gray-500">Agent is Typing...</p>`
+    }
+    else if (data.type == 'agent_clear_typing')
+    {
+        console.log('agent clear typing - main.js');
+        remove_typing_element()
     }
     scrollToBotttom()
     console.log('insertMessageToChatLog')
@@ -174,3 +193,21 @@ chatMessageInputElement.onkeyup = (e) => {
         sendMessage()
     }
 }
+chatMessageInputElement.onfocus = (e) => {
+    e.preventDefault();
+    chatSocket.send(JSON.stringify(
+      {
+        'type': 'customer_typing'
+      }
+    ))
+    }
+
+
+    chatMessageInputElement.onblur = (e) => {
+    e.preventDefault();
+    chatSocket.send(JSON.stringify(
+      {
+        'type': 'customer_clear_typing'
+      }
+    ))
+    }

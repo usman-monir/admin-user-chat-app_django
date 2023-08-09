@@ -14,7 +14,9 @@
             <h2 class="text-lg text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec accumsan tortor at sem fermentum tempor. Suspendisse vitae augue dolor. Nunc sed eleifend nulla.</h2>
         </div>
     </div>
+    {% if request.user.is_authenticated %}
     {% include 'chat/partials/chat_bubble.html' %}
+    {% endif %}
 {% endblock %}
 {% block scripts %}
 <script src='{% static 'js/main.js' %}'></script>

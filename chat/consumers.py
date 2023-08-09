@@ -40,8 +40,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Receive message from WebSocket (front end)
         text_data_json = json.loads(text_data)
         type = text_data_json['type']
-        message = text_data_json['message']
-        name = text_data_json['name']
+        message = text_data_json.get('message', '')
+        name = text_data_json.get('name', '')
         agent = text_data_json.get('agent', '')
 
         if type == 'message':
@@ -56,7 +56,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'initials': initials(name),
                     'created_at': timesince(new_message.created_at),
                 })
-
+        elif type == 'agent_typing':
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'agent_typing',
+            })
+        elif type == 'agent_clear_typing':
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'agent_clear_typing',
+            })
+        elif type == 'customer_typing':
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'customer_typing',
+            })
+        elif type == 'customer_clear_typing':
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'customer_clear_typing',
+            })
 
     async def chat_message(self, event):
         print('chat message')
@@ -76,6 +91,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': event['type'],
             }
         ))
+
+    async def agent_typing(self, event):
+        await self.send(text_data=json.dumps({
+            'type': event['type'],
+        }))
+
+    async def agent_clear_typing(self, event):
+        await self.send(text_data=json.dumps({
+            'type': event['type'],
+        }))
+
+    async def customer_typing(self, event):
+        await self.send(text_data=json.dumps({
+            'type': event['type'],
+        }))
+
+    async def customer_clear_typing(self, event):
+        await self.send(text_data=json.dumps({
+            'type': event['type'],
+        }))
 
     @sync_to_async
     def close_room(self):

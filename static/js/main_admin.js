@@ -23,6 +23,15 @@ const scrollToBotttom = () => {
   chatLogElement.scrollTop = chatLogElement.scrollHeight;
 };
 
+
+const remove_typing_element = () => {
+  const customer_typing = document.querySelector('#customer-typing')
+  if(customer_typing) {
+      customer_typing.remove()
+  }
+}
+
+
 const sendMessage = () => {
   chatSocket.send(
     JSON.stringify({
@@ -52,6 +61,7 @@ const insertMessageToChatLog = (data) => {
                 </div>
             `;
     } else {
+      remove_typing_element()
       chatLogElement.innerHTML += `
                 <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
                     <div>
@@ -66,6 +76,16 @@ const insertMessageToChatLog = (data) => {
                 </div>
             `;
     }
+  }else if (data.type == 'customer_typing')
+  {
+      console.log('customer typing - main.js');
+        remove_typing_element()
+        chatLogElement.innerHTML += ` <p id='customer-typing' class="p-3 text-center text-sm text-gray-500">Customer is Typing...</p>`
+  }
+  else if (data.type == 'customer_clear_typing')
+  {
+      console.log('customer clear typing - main.js');
+      remove_typing_element()
   }
   scrollToBotttom();
 };
@@ -101,3 +121,22 @@ chatMessageInputElement.onkeyup = (e) => {
     sendMessage();
   }
 };
+
+chatMessageInputElement.onfocus = (e) => {
+e.preventDefault();
+chatSocket.send(JSON.stringify(
+  {
+    'type': 'agent_typing'
+  }
+))
+}
+
+
+chatMessageInputElement.onblur = (e) => {
+e.preventDefault();
+chatSocket.send(JSON.stringify(
+  {
+    'type': 'agent_clear_typing'
+  }
+))
+}
