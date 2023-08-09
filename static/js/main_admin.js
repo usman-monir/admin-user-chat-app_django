@@ -11,7 +11,7 @@ let chatSocket = null;
 const chatLogElement = document.querySelector("#chat_log");
 const chatMessageInputElement = document.querySelector("#chat_message_input");
 const chatMessageSubmitElement = document.querySelector("#chat_message_submit");
-const client = document.querySelector("#client");
+const agent_name = document.querySelector("#agent_name");
 const uuid = document.querySelector("#uuid");
 const agent = document.querySelector("#agent");
 
@@ -35,10 +35,10 @@ const remove_typing_element = () => {
 const sendMessage = () => {
   chatSocket.send(
     JSON.stringify({
-      type: "message",
-      message: chatMessageInputElement.value || "𝘦𝘮𝘱𝘵𝘺 𝘮𝘦𝘴𝘴𝘢𝘨𝘦!",
-      agent: agent.value,
-      name: client.value,
+      'type': "message",
+      'message': chatMessageInputElement.value || "𝘦𝘮𝘱𝘵𝘺 𝘮𝘦𝘴𝘴𝘢𝘨𝘦!",
+      'agent': agent.value,
+      'name': agent_name.value,
     })
   );
   chatMessageInputElement.value = "";

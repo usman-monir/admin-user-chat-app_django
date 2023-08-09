@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('uuid', models.CharField(max_length=255)),
-                ('client', models.CharField(max_length=255)),
+                ('room_name', models.CharField(max_length=255)),
                 ('url', models.CharField(blank=True, max_length=255, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('status', models.CharField(choices=[('waiting', 'waiting'), ('active', 'active'), ('closed', 'closed')], default='waiting', max_length=20)),

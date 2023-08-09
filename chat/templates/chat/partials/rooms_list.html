@@ -7,7 +7,7 @@
 
             <p>
                 <b>ID: </b>{{ room.uuid }}<br>
-                <b>Name: </b>{{ room.client }}<br>
+                <b>Name: </b>{{ room.room_name }}<br>
                 <b>Status: </b>{{ room.get_status_display }}<br>
                 <b>Agent: </b>{% firstof room.agent.name 'None yet...' %}
             </p>

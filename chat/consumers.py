@@ -20,6 +20,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
         # Inform user
         if self.user.is_staff:
+            await self.save_room_agent()
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -32,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('disconnect')
         # leave the room
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        if not self.user.is_staff:
+        if self.user.is_staff:
             await self.close_room()
 
     async def receive(self, text_data):
@@ -122,6 +123,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_room(self):
         return Room.objects.get(uuid=self.room_name)
 
+
+    @sync_to_async
+    def save_room_agent(self):
+        self.room = Room.objects.get(uuid=self.room_name)
+        self.room.agent = self.user
+        self.room.save()
 
     @sync_to_async
     def save_new_message_to_db(self,sent_by, message, agent):
